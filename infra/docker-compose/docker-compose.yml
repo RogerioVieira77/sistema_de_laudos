@@ -1,0 +1,310 @@
+# ============================================
+# Docker Compose - Orquestração de Contêineres
+# Versão: '3.9'
+# Autor: [Rogerio Vieira]
+# Data: [02-02-2026]
+# ============================================
+
+# ============================================
+# DESCRIÇÃO:
+# Arquivo de configuração para orquestrar múltiplos contêineres Docker
+# Containers Principais da Aplicação - (o nome do serviço vira o nome lógico do container)
+# ============================================
+
+# ============================================ 
+#EXECUÇÃO: 
+# Definir Variáveis de ambiente no arquivo.env.XXX (XXX = dev, prod, hom, test)
+# Criar o arquivo .env.XXX para cada ambiente.
+# Executar o comando:
+# docker compose (caminho do .env) (comando)
+# Exemplo: 
+# -> docker compose --env-file .env.dev up -d
+# -> docker compose --env-file .env.dev config
+# *** Apontar o nome e local do arquivo .env.XXX para cada ambiente *** 
+# ============================================
+
+# ============================================
+# SERVIÇOS
+# Containers Principais da Aplicação - (o nome do serviço vira o nome lógico do container)
+# ============================================
+services:
+
+  # ============================================
+  # Aplicação Backend (FastAPI)
+  # ============================================
+  backend:
+    image: python:3.12-slim
+    container_name: sistema_laudos_backend_dev
+    restart: unless-stopped
+    
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    command: uvicorn app.main:app --host
+
+    ports:
+      - ${BACKEND_PORT:?BACKEND_PORT is required}
+
+
+   # ============================================
+  # Aplicação Frontend (React)
+  # ============================================
+  frontend:
+    image: node:20-alpine
+    container_name: sistema_laudos_frontend_dev
+    restart: unless-stopped 
+
+  # ============================================
+  # Banco de Dados Principal (PostgreSQL)
+  # ============================================
+  postgres:
+    image: postgres:16
+    container_name: sistema_de_laudos_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
+      POSTGRES_USER: ${DB_USER:?DB_USER is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=pt_BR.UTF-8"
+
+    ports:
+      - "${DB_PORT:?DB_PORT is required}:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql      
+
+    networks:
+      - sistema_laudos_net_dev
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-laudos_user} -d ${DB_NAME:-sistema_de_laudos}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Cache e Fila (Redis e Celery)
+  # ============================================
+  redis:
+    image: redis:7
+    container_name: sistema_laudos_redis_dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    ports:
+      - "${REDIS_PORT:?REDIS_PORT is required}:6379"
+        
+    volumes:
+      - redis_data:/data
+    networks:
+      - sistema_laudos_net_dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Segurança e Autenticação (Keycloak)
+  # ============================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: sistema_laudos_keycloak_dev
+    restart: unless-stopped
+    #command: start-dev
+    
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:?KEYCLOAK_ADMIN_USER is required}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:?KEYCLOAK_DB_NAME is required}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:?KEYCLOAK_DB_USER is required}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD is required}
+      
+      KC_PROXY: edge
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost:8080}
+  
+  #    KC_DB: postgres
+  #    KC_DB_URL: jdbc:postgresql://postgres:5432/${KC_DB_NAME}
+  #    KC_DB_USERNAME: ${KC_DB_USER:?KC_DB_USER is required}
+  #    KC_DB_PASSWORD: ${KC_DB_PASSWORD:?KC_DB_PASSWORD is required}
+  #    KEYCLOAK_ADMIN: ${KC_ADMIN_USER:?KC_ADMIN_USER is required}
+  #    KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:?KC_ADMIN_PASSWORD is required}
+  #    KC_HTTP_ENABLED: "true"
+  #    KC_PROXY: edge
+  
+    depends_on:
+      - postgres
+
+    ports:
+      - ${KEYCLOAK_PORT:?KEYCLOAK_PORT is required}
+      
+    networks:
+     - sistema_laudos_net_dev
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Servidor Web, Reverse Proxy e Load Balancer (Nginx)
+  # ============================================
+  nginx:
+    image: nginx:alpine
+    container_name: sistema_laudos_nginx_dev
+    restart: unless-stopped
+   
+    ports:
+      - "${NGINX_HTTP_PORT:?NGINX_HTTP_PORT is required}:80"
+      - "${NGINX_HTTPS_PORT:?NGINX_HTTPS_PORT is required}:443"
+    
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+      
+    depends_on:
+      - keycloak
+    networks:
+      - sistema_laudos_net_dev
+
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+# ============================================
+  # Tarefas Assíncronas (Celery Worker)
+  # ============================================
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sistema_laudos_celery_dev
+    restart: unless-stopped
+    
+    command: celery -A app.tasks worker --loglevel=info --concurrency=4
+    
+    environment:
+      # (mesmas variáveis que o backend)
+      
+      DATABASE_URL: postgresql://${DB_USER:?DB_USER is required}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:?DB_NAME is required}
+
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
+      
+      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/1
+      
+      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/2
+      
+      ENVIRONMENT: ${ENVIRONMENT:?ENVIRONMENT is required}
+      
+      DEBUG: ${DEBUG:?DEBUG is required}
+    
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+
+    depends_on:
+      - postgres
+      - redis
+      - backend
+
+    networks:
+      - sistema_laudos_net_dev
+
+  # ============================================
+  # Celery Flower - Monitoramento
+  # ============================================
+  #  flower:
+  #  build:
+  #    context: ./backend
+  #    dockerfile: Dockerfile
+  #  container_name: sistema_laudos_flower_dev
+  #  restart: unless-stopped
+  #  command: celery -A app.tasks flower --port=5555
+
+  # environment:
+  #    CELERY_BROKER_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/1
+  #    CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/2
+  #  
+  #  ports:
+  #  - "${FLOWER_PORT:?FLOWER_PORT is required}:5555"
+  #  
+  #  volumes:
+  #    - ./backend:/app
+  #    - /app/__pycache__
+  #
+  #  depends_on:
+  #    - redis
+  #    - celery
+  # networks:
+  #    - sistema_laudos_net_dev
+      
+  #  healthcheck:
+  #    test: ["CMD", "curl", "-f", "http://localhost:5555"]
+  #    interval: 15s
+  #    timeout: 5s
+  #    retries: 5
+
+# ============================================
+# Volumes Internos dos Containers, os dados não são perdidos se o container cair
+# Persistir dados, logs, Compartilhamento de código e configurações.
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+# ============================================
+# NETWORKS
+# Rede entre os containers para comunicação interna
+# Docker Compose cria uma rede automaticamente, é possível definir redes adicionais.
+# ============================================
+networks:
+  sistema_laudos_net_dev:
+    driver: bridge
+
+# ============================================
+# VALIDAÇÃO:
+# Validar Imagens
+# Verificar portas expostas nos containers
+# Verificar volumes montados nos containers
+# Verificar as Dependências entre serviços (depends_on, healthcheck, keycloak depende de postgres...)
+# Configurar reinício automático (restart: unless-stopped)
+
+# ============================================
+#COMANDOS ÚTEIS
+# ============================================
+# Docker:
+# -> docker ps -a                 # lista todos os containers
+# -> docker images                # lista todas as imagens
+# -> docker volume ls             # lista volumes
+# -> docker network ls            # lista redes
+# -> docker inspect <container>   # inspeciona container
+# -> docker logs <container>      # logs do container
+# -> docker rm <container>        # remove container
+# -> docker rmi <image>           # remove imagem
+# -> docker volume rm <volume>    # remove volume
+# -> docker network rm <network>  # remove rede
+#- > docker container stop $(docker container ls -q)  # para todos os containers
+# ============================================
+# Docker Compose:
+# -> docker compose config      # valida o arquivo docker-compose.yml
+# -> docker compose up -d        # sobe tudo
+# -> docker compose down         # derruba tudo
+# -> docker compose ps           # lista containers
+# -> docker compose logs -f      # logs
+# -> docker compose build        # rebuild imagens
+# -> docker compose restart      # reinicia serviços
+# ============================================

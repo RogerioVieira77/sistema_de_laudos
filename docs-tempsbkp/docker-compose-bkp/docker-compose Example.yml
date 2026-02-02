@@ -232,7 +232,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: sistema_laudos_flower
+    container_name: sistema_laudos_flower_dev
     restart: unless-stopped
     command: celery -A app.tasks flower --port=5555
     environment:
