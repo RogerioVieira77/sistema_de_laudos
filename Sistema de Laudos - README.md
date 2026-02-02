@@ -18,7 +18,7 @@ Tecnologia | Função
 Python | linguagem principal
 FastAPI | API REST
 PyMuPDF / pdfplumber | (leitura de PDFs)
-MySQL | Banco de dados
+PostgreSQL 16 | Banco de dados
 SQLAlchemy | ORM
 Alembic | Migrations
 Pydantic | DTOs / Contratos

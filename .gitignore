@@ -1,0 +1,100 @@
+# ============================================
+# Git Ignore - Sistema de Laudos
+# ============================================
+
+# Variáveis de Ambiente
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+dist/
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Arquivos de Build
+backend/app/__pycache__/
+frontend/dist/
+
+# Dados Sensíveis
+*.key
+*.pem
+*.cert
+secrets/
+
+# Arquivos Temporários
+*.tmp
+*.temp
+tmp/
+.tmp/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Editor Backup
+*.bak
+*.backup
+
+# Arquivos de configuração sensível
+.env.production
+.env.staging
+
+# Arquivos de uploads (se existirem)
+uploads/
+media/
+static/
+
+# Certificados SSL
+nginx/ssl/*.crt
+nginx/ssl/*.key
+nginx/ssl/*.pem
+
+# Dados de banco (se persistidos localmente)
+data/
+pgdata/
+redisdata/
