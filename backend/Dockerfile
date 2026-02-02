@@ -38,7 +38,6 @@ COPY --from=builder /root/.local /root/.local
 COPY ./app ./app
 COPY ./migrations ./migrations
 COPY alembic.ini .
-COPY .env.example .
 
 # Configurar PATH
 ENV PATH=/root/.local/bin:$PATH \

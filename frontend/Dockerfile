@@ -8,10 +8,11 @@ FROM node:20-alpine as builder
 WORKDIR /app
 
 # Copiar package files
-COPY package.json package-lock.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 # Instalar dependências
-RUN npm ci
+RUN npm install
 
 # Copiar código-fonte
 COPY . .
@@ -33,9 +34,11 @@ COPY --from=builder /app/dist .
 # Copiar configuração nginx customizada
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Criar usuário não-root por segurança
-RUN addgroup -g 101 -S nginx && \
-    adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+# Criar usuário não-root por segurança (se não existir)
+RUN if ! id -u nginx >/dev/null 2>&1; then \
+    addgroup -g 101 -S nginx && \
+    adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx; \
+    fi
 
 # Configurar permissões
 RUN chown -R nginx:nginx /usr/share/nginx/html && \

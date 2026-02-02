@@ -1,0 +1,46 @@
+#version: '3.9'
+
+services:
+  # ============================================
+  # PostgreSQL 16 - Banco de Dados Principal
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: sistema_laudos_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sistema_de_laudos}
+      POSTGRES_USER: ${DB_USER:-laudos_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-laudos_password_123}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=pt_BR.UTF-8"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - sistema_laudos_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-laudos_user} -d ${DB_NAME:-sistema_de_laudos}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+# ============================================
+# VOLUMES - Persistência de Dados
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+# ============================================
+# NETWORKS - Comunicação entre Serviços
+# ============================================
+networks:
+  sistema_laudos_net:
+    driver: bridge
