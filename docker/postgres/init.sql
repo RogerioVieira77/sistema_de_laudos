@@ -4,22 +4,27 @@
 -- ============================================
 
 -- Criar banco de dados para Keycloak
-CREATE DATABASE keycloak
+CREATE DATABASE keycloak_dev
     ENCODING 'UTF8'
     LC_COLLATE 'pt_BR.UTF-8'
     LC_CTYPE 'pt_BR.UTF-8';
 
--- Conectar ao banco keycloak
-\connect keycloak;
+-- Criar usuário para Keycloak (se não existir)
+DO $$ BEGIN
+    CREATE USER kcdbadmin_dev WITH PASSWORD 'Dev@)((42))';
+EXCEPTION WHEN duplicate_object THEN
+    -- Usuário já existe, apenas dar permissões
+    ALTER USER kcdbadmin_dev WITH PASSWORD 'Dev@)((42))';
+END $$;
 
--- Criar extensões úteis
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+-- Dar permissões ao usuário do Keycloak
+ALTER USER kcdbadmin_dev CREATEDB;
+GRANT ALL PRIVILEGES ON DATABASE keycloak_dev TO kcdbadmin_dev;
 
--- Conectar de volta ao banco principal
+-- Conectar ao banco principal
 \connect sistema_de_laudos;
 
--- Criar extensões no banco principal
+-- Criar extensões úteis
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 CREATE EXTENSION IF NOT EXISTS "btree_gin";

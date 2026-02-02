@@ -5,7 +5,7 @@
 # Stage 1: Builder
 FROM python:3.12-slim as builder
 
-WORKDIR /app
+WORKDIR /build
 
 # Instalar dependências do sistema necessárias
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -31,25 +31,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar pacotes Python do builder
-COPY --from=builder /root/.local /root/.local
+# Criar usuário não-root por segurança
+RUN useradd -m -u 1000 appuser
+
+# Copiar pacotes Python do builder com permissões corretas
+COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 
 # Copiar código da aplicação
-COPY ./app ./app
-COPY ./migrations ./migrations
-COPY alembic.ini .
+COPY --chown=appuser:appuser ./app ./app
+COPY --chown=appuser:appuser ./migrations ./migrations
+COPY --chown=appuser:appuser alembic.ini .
 
 # Configurar PATH
-ENV PATH=/root/.local/bin:$PATH \
+ENV PATH=/home/appuser/.local/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Criar usuário não-root por segurança
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
-
+# Trocar para usuário não-root
 USER appuser
 
 # Health check
@@ -61,3 +61,4 @@ EXPOSE 8000
 
 # Comando de inicialização
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+

@@ -33,27 +33,74 @@ services:
   # Aplicação Backend (FastAPI)
   # ============================================
   backend:
-    image: python:3.12-slim
-    container_name: sistema_laudos_backend_dev
-    restart: unless-stopped
-    
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: sistema_laudos_backend_dev
+    restart: unless-stopped
 
-    command: uvicorn app.main:app --host
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
     ports:
-      - ${BACKEND_PORT:?BACKEND_PORT is required}
+      - "${BACKEND_PORT:?BACKEND_PORT is required}:8000"
+
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:?DB_USER is required}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:?DB_NAME is required}
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
+      SECRET_KEY: ${BACK_SECRET_KEY:?BACK_SECRET_KEY is required}
+      ALGORITHM: ${ALGORITHM:?ALGORITHM is required}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:?ACCESS_TOKEN_EXPIRE_MINUTES is required}
+      ENVIRONMENT: ${ENVIRONMENT:?ENVIRONMENT is required}
+      DEBUG: ${DEBUG:?DEBUG is required}
+      LOG_LEVEL: ${LOG_LEVEL:?LOG_LEVEL is required}
+
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    networks:
+      - sistema_laudos_net_dev
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
 
    # ============================================
   # Aplicação Frontend (React)
   # ============================================
   frontend:
-    image: node:20-alpine
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: sistema_laudos_frontend_dev
-    restart: unless-stopped 
+    restart: unless-stopped
+
+    ports:
+      - "${FRONTEND_PORT:?FRONTEND_PORT is required}:80"
+
+    environment:
+      VITE_API_URL: ${VITE_API_URL:?VITE_API_URL is required}
+
+    depends_on:
+      - backend
+
+    networks:
+      - sistema_laudos_net_dev
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # ============================================
   # Banco de Dados Principal (PostgreSQL)
@@ -66,7 +113,7 @@ services:
       POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
       POSTGRES_USER: ${DB_USER:?DB_USER is required}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=pt_BR.UTF-8"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
 
     ports:
       - "${DB_PORT:?DB_PORT is required}:5432"
@@ -107,50 +154,42 @@ services:
 
   # ============================================
   # Segurança e Autenticação (Keycloak)
+  # TODO: Corrigir problema de autenticação com PostgreSQL
   # ============================================
-  keycloak:
-    image: quay.io/keycloak/keycloak:25.0
-    container_name: sistema_laudos_keycloak_dev
-    restart: unless-stopped
-    #command: start-dev
-    
-    environment:
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:?KEYCLOAK_ADMIN_USER is required}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:?KEYCLOAK_DB_NAME is required}
-      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:?KEYCLOAK_DB_USER is required}
-      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD is required}
-      
-      KC_PROXY: edge
-      KC_PROXY_HEADERS: xforwarded
-      KC_HTTP_ENABLED: "true"
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost:8080}
-  
-  #    KC_DB: postgres
-  #    KC_DB_URL: jdbc:postgresql://postgres:5432/${KC_DB_NAME}
-  #    KC_DB_USERNAME: ${KC_DB_USER:?KC_DB_USER is required}
-  #    KC_DB_PASSWORD: ${KC_DB_PASSWORD:?KC_DB_PASSWORD is required}
-  #    KEYCLOAK_ADMIN: ${KC_ADMIN_USER:?KC_ADMIN_USER is required}
-  #    KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:?KC_ADMIN_PASSWORD is required}
-  #    KC_HTTP_ENABLED: "true"
-  #    KC_PROXY: edge
-  
-    depends_on:
-      - postgres
-
-    ports:
-      - ${KEYCLOAK_PORT:?KEYCLOAK_PORT is required}
-      
-    networks:
-     - sistema_laudos_net_dev
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:25.0
+  #   container_name: sistema_laudos_keycloak_dev
+  #   restart: unless-stopped
+  #   command: start-dev
+  #   
+  #   environment:
+  #     KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:?KEYCLOAK_ADMIN_USER is required}
+  #     KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
+  #     KC_DB: postgres
+  #     KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:?KEYCLOAK_DB_NAME is required}
+  #     KC_DB_USERNAME: ${KEYCLOAK_DB_USER:?KEYCLOAK_DB_USER is required}
+  #     KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD is required}
+  #     
+  #     KC_PROXY: edge
+  #     KC_PROXY_HEADERS: xforwarded
+  #     KC_HTTP_ENABLED: "true"
+  #     KC_HOSTNAME_STRICT: "false"
+  #     KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost}
+  #   
+  #   depends_on:
+  #     - postgres
+  #
+  #   ports:
+  #     - "${KEYCLOAK_PORT:?KEYCLOAK_PORT is required}:8080"
+  #     
+  #   networks:
+  #    - sistema_laudos_net_dev
+  #
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 5
 
   # ============================================
   # Servidor Web, Reverse Proxy e Load Balancer (Nginx)
@@ -170,8 +209,8 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - nginx_logs:/var/log/nginx
       
-    depends_on:
-      - keycloak
+    # depends_on:
+    #   - keycloak
     networks:
       - sistema_laudos_net_dev
 
@@ -184,41 +223,34 @@ services:
 # ============================================
   # Tarefas Assíncronas (Celery Worker)
   # ============================================
-  celery:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: sistema_laudos_celery_dev
-    restart: unless-stopped
-    
-    command: celery -A app.tasks worker --loglevel=info --concurrency=4
-    
-    environment:
-      # (mesmas variáveis que o backend)
-      
-      DATABASE_URL: postgresql://${DB_USER:?DB_USER is required}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:?DB_NAME is required}
-
-      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
-      
-      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/1
-      
-      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/2
-      
-      ENVIRONMENT: ${ENVIRONMENT:?ENVIRONMENT is required}
-      
-      DEBUG: ${DEBUG:?DEBUG is required}
-    
-    volumes:
-      - ./backend:/app
-      - /app/__pycache__
-
-    depends_on:
-      - postgres
-      - redis
-      - backend
-
-    networks:
-      - sistema_laudos_net_dev
+  # celery:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: sistema_laudos_celery_dev
+  #   restart: unless-stopped
+  #   
+  #   command: celery -A app.tasks worker --loglevel=info --concurrency=4
+  #   
+  #   environment:
+  #     DATABASE_URL: postgresql://${DB_USER:?DB_USER is required}:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/${DB_NAME:?DB_NAME is required}
+  #     REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/0
+  #     CELERY_BROKER_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/1
+  #     CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379/2
+  #     ENVIRONMENT: ${ENVIRONMENT:?ENVIRONMENT is required}
+  #     DEBUG: ${DEBUG:?DEBUG is required}
+  #   
+  #   volumes:
+  #     - ./backend:/app
+  #     - /app/__pycache__
+  #
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - backend
+  #
+  #   networks:
+  #     - sistema_laudos_net_dev
 
   # ============================================
   # Celery Flower - Monitoramento
