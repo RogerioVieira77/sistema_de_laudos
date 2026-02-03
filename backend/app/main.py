@@ -4,8 +4,9 @@ FastAPI Main Application
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.openapi.utils import get_openapi
+from pathlib import Path
 
 from app.api.v1 import api_v1_router
 from app.core.exceptions import APIException
@@ -15,7 +16,7 @@ app = FastAPI(
     description="API para geração de laudos de documentoscopia",
     version="1.0.0",
     docs_url="/api/v1/docs",
-    redoc_url="/api/v1/redoc",
+    redoc_url=None,  # Desabilitar ReDoc padrão, usaremos custom
     openapi_url="/api/v1/openapi.json",
 )
 
@@ -45,6 +46,16 @@ async def api_exception_handler(request, exc: APIException):
 # Include API v1 Routers
 # ============================================================================
 app.include_router(api_v1_router, prefix="/api/v1")
+
+# ============================================================================
+# Custom ReDoc Route
+# ============================================================================
+@app.get("/api/v1/redoc", include_in_schema=False)
+@app.head("/api/v1/redoc", include_in_schema=False)
+async def redoc_html():
+    """Custom ReDoc documentation using @latest version"""
+    redoc_file = Path(__file__).parent / "redoc.html"
+    return FileResponse(redoc_file, media_type="text/html")
 
 # ============================================================================
 # Root Endpoints

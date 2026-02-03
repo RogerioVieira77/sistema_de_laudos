@@ -1,0 +1,335 @@
+/* ContratoTable Styles */
+.tableContainer {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ecf0f1;
+  overflow: hidden;
+}
+
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: #7f8c8d;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ecf0f1;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.emptyState h3 {
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #7f8c8d;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: #f5f7fa;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table th.sortable:hover {
+  background: #eef2f7;
+}
+
+.sortIconInactive {
+  color: #bdc3c7;
+  opacity: 0.5;
+}
+
+.sortIconActive {
+  color: #667eea;
+}
+
+.table tbody {
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+/* Table Rows */
+.tableRow {
+  border-bottom: 1px solid #ecf0f1;
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: #f5f7fa;
+}
+
+.table td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #2c3e50;
+}
+
+/* ID Cell */
+.idCell code {
+  background: #f5f7fa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #667eea;
+}
+
+/* Filename Cell */
+.filenameCell {
+  width: 35%;
+}
+
+.fileInfo {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.fileIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.filename {
+  font-weight: 500;
+  word-break: break-word;
+  max-width: 400px;
+}
+
+.fileSize {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+}
+
+/* Date Cell */
+.dateCell {
+  width: 15%;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+/* Status Cell */
+.statusCell {
+  width: 15%;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusPendente {
+  background: rgba(255, 193, 7, 0.1);
+  color: #f39c12;
+  border: 1px solid #f39c12;
+}
+
+.statusProcessando {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border: 1px solid #667eea;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.statusConcluido {
+  background: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+  border: 1px solid #27ae60;
+}
+
+.statusErro {
+  background: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+  border: 1px solid #ff4757;
+}
+
+/* Actions Cell */
+.actionsCell {
+  width: 12%;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.actionBtn {
+  background: white;
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #667eea;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionBtn:hover {
+  background: #f5f7fa;
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.actionBtn.deleteBtn {
+  color: #ff4757;
+  border-color: #ff4757;
+}
+
+.actionBtn.deleteBtn:hover {
+  background: rgba(255, 71, 87, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .fileInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filenameCell {
+    width: 30%;
+  }
+
+  .dateCell {
+    width: 20%;
+  }
+
+  .statusCell {
+    width: 20%;
+  }
+
+  .actionsCell {
+    width: 15%;
+  }
+
+  .actionButtons {
+    gap: 0.25rem;
+  }
+
+  .actionBtn {
+    padding: 0.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tableContainer {
+    border-radius: 8px;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .tableRow {
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+  }
+
+  .table td {
+    padding: 0.75rem 0;
+    border: none;
+    text-align: left;
+    position: relative;
+    padding-left: 100px;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    font-weight: 600;
+    color: #667eea;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+
+  .idCell::before { content: 'ID'; }
+  .filenameCell::before { content: 'Arquivo'; }
+  .dateCell::before { content: 'Data'; }
+  .statusCell::before { content: 'Status'; }
+  .actionsCell::before { content: 'Ações'; }
+
+  .actionButtons {
+    justify-content: flex-start;
+  }
+}

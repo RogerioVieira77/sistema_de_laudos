@@ -1,0 +1,159 @@
+/* Pagination Styles */
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: white;
+  border-top: 1px solid #ecf0f1;
+  gap: 2rem;
+}
+
+.info {
+  flex: 1;
+}
+
+.itemsInfo {
+  color: #7f8c8d;
+  font-size: 0.95rem;
+}
+
+.itemsInfo strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Items Per Page */
+.itemsPerPage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.itemsPerPage label {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+  background: white;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select:hover {
+  border-color: #667eea;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+}
+
+.select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Page Controls */
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navBtn {
+  background: white;
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navBtn:hover:not(:disabled) {
+  border-color: #667eea;
+  background: #f5f7fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.15);
+}
+
+.navBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #bdc3c7;
+}
+
+.pageInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.pageInput {
+  width: 50px;
+  padding: 0.5rem;
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+  text-align: center;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.pageInput:hover {
+  border-color: #667eea;
+}
+
+.pageInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.pageInfo span {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .paginationContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .info {
+    text-align: center;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .itemsPerPage {
+    justify-content: center;
+  }
+
+  .pageControls {
+    justify-content: center;
+  }
+}

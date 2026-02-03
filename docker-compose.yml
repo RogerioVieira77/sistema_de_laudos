@@ -210,7 +210,12 @@ services:
       - nginx_logs:/var/log/nginx
       
     depends_on:
-      - keycloak
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+      # keycloak:
+      #   condition: service_healthy
     networks:
       - sistema_laudos_net_dev
 

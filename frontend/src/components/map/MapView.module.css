@@ -1,0 +1,205 @@
+.mapContainer {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #f0f0f0;
+}
+
+.mapWrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.markerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.markerIcon:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.markerGreen {
+  background-color: #27ae60;
+}
+
+.markerRed {
+  background-color: #e74c3c;
+}
+
+.markerBlue {
+  background-color: #3498db;
+}
+
+.markerPurple {
+  background-color: #9b59b6;
+}
+
+.markerContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.popupContent {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  min-width: 200px;
+}
+
+.popupTitle {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.popupDescription {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.popupInfo {
+  padding: 8px;
+  background: #f0f3ff;
+  border-left: 3px solid #667eea;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #667eea;
+}
+
+/* Leaflet overrides for better styling */
+:global(.leaflet-popup-content-wrapper) {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+:global(.leaflet-popup-tip) {
+  background-color: white;
+}
+
+:global(.leaflet-container) {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+:global(.leaflet-control) {
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+:global(.leaflet-control-zoom a) {
+  color: #667eea;
+  font-weight: 600;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+}
+
+:global(.leaflet-control-zoom a:hover) {
+  background-color: #f0f3ff;
+}
+
+:global(.leaflet-control-zoom a.leaflet-disabled) {
+  color: #ccc;
+}
+
+.emptyState {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px 30px;
+  border-radius: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #7f8c8d;
+  font-size: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mapContainer {
+    height: 350px;
+    border-radius: 6px;
+  }
+
+  .markerIcon {
+    width: 28px;
+    height: 28px;
+    border-width: 2px;
+    font-size: 14px;
+  }
+
+  .markerIcon:hover {
+    transform: scale(1.1);
+  }
+
+  .popupContent {
+    min-width: 160px;
+  }
+
+  .popupTitle {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .popupDescription {
+    font-size: 13px;
+  }
+
+  .popupInfo {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mapContainer {
+    height: 300px;
+  }
+
+  .emptyState {
+    padding: 30px 20px;
+  }
+
+  .emptyIcon {
+    font-size: 40px;
+  }
+}

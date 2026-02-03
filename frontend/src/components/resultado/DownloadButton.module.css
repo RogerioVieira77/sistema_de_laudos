@@ -1,0 +1,244 @@
+.downloadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* Download Button */
+.downloadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  white-space: nowrap;
+}
+
+.downloadButton:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.downloadButton:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
+}
+
+/* Loading State */
+.downloadButton.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Success State */
+.downloadButton.success {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.downloadButton.success:hover {
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+/* Error State */
+.downloadButton.error {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.downloadButton.error:hover {
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* Spinner Animation */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button Text */
+.buttonText {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* File Info */
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.fileName {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.fileSize {
+  color: #7f8c8d;
+  font-size: 11px;
+}
+
+/* Messages */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #ffe8e8;
+  border: 1px solid #f8d7da;
+  border-left: 4px solid #e74c3c;
+  border-radius: 6px;
+  color: #c0392b;
+  font-size: 13px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.successMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #ecf9f0;
+  border: 1px solid #d4edda;
+  border-left: 4px solid #27ae60;
+  border-radius: 6px;
+  color: #229954;
+  font-size: 13px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .downloadButton {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .buttonText {
+    font-size: 13px;
+  }
+
+  .fileInfo {
+    font-size: 11px;
+  }
+
+  .fileSize {
+    font-size: 10px;
+  }
+
+  .errorMessage,
+  .successMessage {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .downloadContainer {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .downloadButton {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 14px;
+    gap: 8px;
+  }
+
+  .buttonText {
+    font-size: 14px;
+  }
+
+  .fileInfo {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .fileName {
+    word-break: break-all;
+  }
+
+  .errorMessage,
+  .successMessage {
+    width: 100%;
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+}
+
+/* Small Device Responsive */
+@media (max-width: 480px) {
+  .downloadContainer {
+    gap: 8px;
+  }
+
+  .downloadButton {
+    padding: 10px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .buttonText {
+    font-size: 12px;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border-width: 2px;
+  }
+
+  .fileInfo {
+    font-size: 11px;
+  }
+
+  .fileSize {
+    font-size: 10px;
+  }
+
+  .errorMessage,
+  .successMessage {
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 4px;
+  }
+}

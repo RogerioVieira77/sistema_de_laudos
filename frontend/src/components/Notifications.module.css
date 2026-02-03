@@ -1,0 +1,162 @@
+.container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid #3498db;
+  animation: slideIn 0.3s ease-out;
+  pointer-events: auto;
+  min-width: 320px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification.success {
+  border-left-color: #27ae60;
+}
+
+.notification.success .icon {
+  color: #27ae60;
+}
+
+.notification.error {
+  border-left-color: #e74c3c;
+}
+
+.notification.error .icon {
+  color: #e74c3c;
+}
+
+.notification.warning {
+  border-left-color: #f39c12;
+}
+
+.notification.warning .icon {
+  color: #f39c12;
+}
+
+.notification.info {
+  border-left-color: #3498db;
+}
+
+.notification.info .icon {
+  color: #3498db;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #95a5a6;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.closeButton:hover {
+  color: #2c3e50;
+}
+
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .container {
+    top: 16px;
+    right: 16px;
+    max-width: 360px;
+  }
+
+  .notification {
+    min-width: 300px;
+    padding: 14px;
+  }
+
+  .message {
+    font-size: 13px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .container {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+
+  .notification {
+    min-width: auto;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .content {
+    gap: 10px;
+  }
+
+  .message {
+    font-size: 12px;
+  }
+
+  .icon {
+    min-width: 18px;
+  }
+
+  .closeButton {
+    padding: 2px;
+  }
+
+  .closeButton svg {
+    width: 16px;
+    height: 16px;
+  }
+}

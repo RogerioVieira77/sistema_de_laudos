@@ -1,10 +1,10 @@
 # Sistema de Laudos
 
-Sistema de documentoscopia geração de laudo de analise contestação.
+Sistema de documentoscopia e geração de laudo de analise de contestação.
 
 O sistema coleta informações de múltiplas fontes, executa análises especializadas, permite edição manual (prints, imagens e textos), os dados da analise são salvos em um Banco de Dados e o sistema possui uma tela de FrontEnd para importação de documentos e que gera uma prévia visual do laudo de analise, essa tela também possui um botão com a função de exportação do laudo da análise em formato PDF.
 
-O sistema é composto possui uma arquitetura de microserviços e é composto por:
+O sistema é possui uma arquitetura de microserviços e é composto por:
 
 1 - FrontEnd web para a interação do usuário
 2 - Backend com a regras de negocios, estruturas de segurnaça e as definições dos endpoints
@@ -147,6 +147,7 @@ OpenStreetMap + Nominatim + Haversine (Open Source e GRÁTIS)
 * A lista de pareceres será gravada no Banco __sistema_de_laudos__ na tabela pareceres.
 * O sistema busca em suas regras internas qual é o parecer que deve ser utilizado, de acordo com a distancia entre os endereços.
 
+<!-- Tela de Administração de Acessos e Roles>
 <!-- Parecer -->
 <!--  Ao confrontarmos os endereços constatamos que a geolocalização da formalização possui até 5 km de distância do endereço
 de cadastro do reclamante, conforme consulta em bureau externo. -->

@@ -1,0 +1,212 @@
+.container {
+  padding: 24px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statblue {
+  background: #ecf2ff;
+  border-left-color: #667eea;
+}
+
+.statgreen {
+  background: #ecf9f0;
+  border-left-color: #27ae60;
+}
+
+.statpurple {
+  background: #f3ecff;
+  border-left-color: #9b59b6;
+}
+
+.statorange {
+  background: #fff8f0;
+  border-left-color: #f39c12;
+}
+
+.statred {
+  background: #ffe8e8;
+  border-left-color: #e74c3c;
+}
+
+.statgray {
+  background: #f0f0f0;
+  border-left-color: #95a5a6;
+}
+
+.statIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.statUnit {
+  font-size: 13px;
+  font-weight: 600;
+  color: #95a5a6;
+  text-transform: uppercase;
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7f8c8d;
+}
+
+/* Timestamps Section */
+.timestamps {
+  padding: 16px;
+  background: #f8f9fc;
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.timestampItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timestampLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #95a5a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timestampValue {
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 500;
+  font-family: 'Courier New', monospace;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .timestamps {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .statCard {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .statIcon {
+    font-size: 24px;
+  }
+
+  .statValue {
+    font-size: 18px;
+  }
+
+  .timestamps {
+    padding: 12px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .statCard {
+    padding: 10px;
+  }
+
+  .statIcon {
+    font-size: 22px;
+  }
+
+  .statValue {
+    font-size: 16px;
+  }
+
+  .statLabel {
+    font-size: 12px;
+  }
+
+  .timestampValue {
+    font-size: 12px;
+  }
+}
