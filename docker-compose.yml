@@ -154,42 +154,42 @@ services:
 
   # ============================================
   # Segurança e Autenticação (Keycloak)
-  # TODO: Corrigir problema de autenticação com PostgreSQL
   # ============================================
-  # keycloak:
-  #   image: quay.io/keycloak/keycloak:25.0
-  #   container_name: sistema_laudos_keycloak_dev
-  #   restart: unless-stopped
-  #   command: start-dev
-  #   
-  #   environment:
-  #     KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:?KEYCLOAK_ADMIN_USER is required}
-  #     KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
-  #     KC_DB: postgres
-  #     KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:?KEYCLOAK_DB_NAME is required}
-  #     KC_DB_USERNAME: ${KEYCLOAK_DB_USER:?KEYCLOAK_DB_USER is required}
-  #     KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD is required}
-  #     
-  #     KC_PROXY: edge
-  #     KC_PROXY_HEADERS: xforwarded
-  #     KC_HTTP_ENABLED: "true"
-  #     KC_HOSTNAME_STRICT: "false"
-  #     KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost}
-  #   
-  #   depends_on:
-  #     - postgres
-  #
-  #   ports:
-  #     - "${KEYCLOAK_PORT:?KEYCLOAK_PORT is required}:8080"
-  #     
-  #   networks:
-  #    - sistema_laudos_net_dev
-  #
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
-  #     interval: 15s
-  #     timeout: 5s
-  #     retries: 5
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: sistema_laudos_keycloak_dev
+    restart: unless-stopped
+    command: start-dev
+    
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:?KEYCLOAK_ADMIN_USER is required}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:?KEYCLOAK_DB_NAME is required}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:?KEYCLOAK_DB_USER is required}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD is required}
+      
+      KC_PROXY: edge
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost}
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    ports:
+      - "${KEYCLOAK_PORT:?KEYCLOAK_PORT is required}:8080"
+      
+    networks:
+     - sistema_laudos_net_dev
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # ============================================
   # Servidor Web, Reverse Proxy e Load Balancer (Nginx)
@@ -209,8 +209,8 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - nginx_logs:/var/log/nginx
       
-    # depends_on:
-    #   - keycloak
+    depends_on:
+      - keycloak
     networks:
       - sistema_laudos_net_dev
 
