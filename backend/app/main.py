@@ -7,8 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.openapi.utils import get_openapi
 from pathlib import Path
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.api.v1 import api_v1_router
+from app.api.middleware import AuditLoggingMiddleware
+from app.api.rate_limiting import limiter
 from app.core.exceptions import APIException
 
 app = FastAPI(
@@ -21,8 +25,18 @@ app = FastAPI(
 )
 
 # ============================================================================
-# CORS Configuration
+# Rate Limiting Configuration
 # ============================================================================
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# ============================================================================
+# Middleware - ORDEM IMPORTA!
+# ============================================================================
+# Audit Logging deve vir DEPOIS de CORS (para capturar status correto)
+app.add_middleware(AuditLoggingMiddleware)
+
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Configure properly in production

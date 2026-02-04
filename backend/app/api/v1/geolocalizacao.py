@@ -1,5 +1,10 @@
 """
 Geolocalização Router - API endpoints for geolocation analysis
+
+Autenticação: Todos os endpoints requerem JWT Bearer token (get_identity)
+Autorização: Usuarios com roles: analista, revisor, admin
+Isolação: Todos dados filtrados por tenant_id do usuario autenticado
+Rate Limiting: POST (análise) 10 req/min, GET (read) 50 req/min
 """
 
 from fastapi import APIRouter, Depends, Query
@@ -8,7 +13,10 @@ from pydantic import BaseModel
 from typing import Optional
 from decimal import Decimal
 
-from app.api.dependencies import get_db, get_current_user
+from app.api.dependencies import get_db, get_identity
+from app.api.decorators import require_roles, require_tenant
+from app.api.rate_limiting import limiter, RateLimits
+from app.core.oidc_models import Identity
 from app.core.exceptions import (
     ContratoNaoEncontrado,
     BureauNaoEncontrado,
@@ -76,18 +84,26 @@ def get_bureau_service(db: Session = Depends(get_db)) -> BureauService:
         200: {"description": "Análise realizada com sucesso"},
         404: {"description": "Contrato ou Bureau não encontrado"},
         422: {"description": "Dados insuficientes para análise"},
+        429: {"description": "Muitas análises. Limite: 10 por minuto"},
         503: {"description": "Serviço de geocodificação indisponível"},
     }
 )
+@require_roles("analista", "revisor", "admin")
+@require_tenant()
+@limiter.limit(RateLimits.UPLOAD)
 async def analisar_geolocalizacao(
     request: GeolocationAnalysisRequest,
-    current_user_id: int = Depends(get_current_user),
+    req,  # Necessário para rate limiting
+    identity: Identity = Depends(get_identity),
     geo_service: GeolocalizacaoService = Depends(get_geolocalizacao_service),
     contrato_service: ContratoService = Depends(get_contrato_service),
     bureau_service: BureauService = Depends(get_bureau_service),
 ):
     """
     Realiza análise de geolocalização comparando endereço do contrato com bureau.
+    Rate limit: 10 análises por minuto
+    
+    Requer autenticação (JWT Bearer token) e roles: analista, revisor ou admin.
     
     ### Fluxo:
     1. Busca dados_contrato
@@ -119,12 +135,12 @@ async def analisar_geolocalizacao(
     """
     
     try:
-        # Verificar se contrato pertence ao usuário
+        # Verificar se contrato pertence ao tenant do usuário
         contrato = contrato_service.get_contrato(request.contrato_id)
         if not contrato:
             raise ContratoNaoEncontrado(request.contrato_id)
         
-        if contrato.usuario_id != current_user_id:
+        if contrato.tenant_id != identity.tenant_id:
             raise SemPermissao("Você não tem permissão para analisar este contrato")
         
         # Verificar se existem dados de bureau
@@ -143,7 +159,8 @@ async def analisar_geolocalizacao(
         resultado = geo_service.analisar(
             contrato_id=request.contrato_id,
             forcar_atualizacao=request.forcar_atualizacao,
-            usuario_id=current_user_id
+            usuario_id=identity.sub,  # Use UUID from JWT
+            tenant_id=identity.tenant_id  # Include tenant_id
         )
         
         return resultado
@@ -164,16 +181,23 @@ async def analisar_geolocalizacao(
         200: {"description": "Análise encontrada"},
         404: {"description": "Contrato ou análise não encontrada"},
         403: {"description": "Sem permissão"},
+        429: {"description": "Muitas requisições. Limite: 50 por minuto"},
     }
 )
+@require_tenant()
+@limiter.limit(RateLimits.READ)
 async def get_geolocalizacao(
+    request,  # Necessário para rate limiting
     contrato_id: int,
-    current_user_id: int = Depends(get_current_user),
+    identity: Identity = Depends(get_identity),
     geo_service: GeolocalizacaoService = Depends(get_geolocalizacao_service),
     contrato_service: ContratoService = Depends(get_contrato_service),
 ):
     """
     Obtém a análise de geolocalização já realizada para um contrato.
+    
+    Requer autenticação (JWT Bearer token).
+    Rate limit: 50 requisições por minuto
     
     ### Parâmetros:
     - **contrato_id**: ID do contrato
@@ -190,12 +214,12 @@ async def get_geolocalizacao(
     - 403: Sem permissão
     """
     
-    # Verificar se contrato pertence ao usuário
+    # Verificar se contrato pertence ao tenant
     contrato = contrato_service.get_contrato(contrato_id)
     if not contrato:
         raise ContratoNaoEncontrado(contrato_id)
     
-    if contrato.usuario_id != current_user_id:
+    if contrato.tenant_id != identity.tenant_id:
         raise SemPermissao("Você não tem permissão para acessar este contrato")
     
     # Buscar análise anterior

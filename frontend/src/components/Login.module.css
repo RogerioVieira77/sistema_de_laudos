@@ -1,0 +1,108 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.user {
+  display: flex;
+  flex-direction: column;
+}
+
+.email {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.name {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.loginBtn,
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginBtn {
+  background: #3b82f6;
+  color: white;
+}
+
+.loginBtn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.logoutBtn {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.skeleton {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.error {
+  padding: 0.75rem 1rem;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.loginPageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.loginPageContent {
+  text-align: center;
+  color: white;
+}
+
+.loginPageContent h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.loginPageContent p {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}

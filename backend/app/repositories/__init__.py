@@ -9,6 +9,7 @@ from .contrato_repository import ContratoRepository
 from .bureau_repository import BureauRepository
 from .parecer_repository import PareceRepository
 from .logs_repository import LogsAnaliseRepository
+from .audit_log_repository import AuditLogRepository
 
 __all__ = [
     "BaseRepository",
@@ -17,4 +18,5 @@ __all__ = [
     "BureauRepository",
     "PareceRepository",
     "LogsAnaliseRepository",
+    "AuditLogRepository",
 ]

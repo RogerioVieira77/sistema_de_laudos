@@ -57,6 +57,13 @@ from .logs_schema import (
     LogsAnaliseFilterRequest,
 )
 
+# Audit Log Schemas
+from .audit_log_schema import (
+    AuditLogSchema,
+    AuditLogListResponse,
+    AuditActivitySummary,
+)
+
 __all__ = [
     # Usuario
     "UsuarioBase",
@@ -95,5 +102,9 @@ __all__ = [
     "LogsAnaliseResponse",
     "LogsAnaliseListResponse",
     "LogsAnaliseFilterRequest",
+    # Audit Logs
+    "AuditLogSchema",
+    "AuditLogListResponse",
+    "AuditActivitySummary",
 ]
 

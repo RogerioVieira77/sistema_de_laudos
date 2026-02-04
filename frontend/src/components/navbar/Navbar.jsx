@@ -1,9 +1,12 @@
 import { useState } from 'react'
-import { Menu, X, User, Bell } from 'lucide-react'
+import { Menu, X, User, Bell, LogOut, LogIn } from 'lucide-react'
+import { useAuth, useUser } from '../../contexts/AuthContext'
 import styles from './Navbar.module.css'
 
 export default function Navbar({ onMenuClick }) {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const { isAuthenticated, login, logout } = useAuth()
+  const user = useUser()
 
   return (
     <nav className={styles.navbar}>
@@ -21,42 +24,70 @@ export default function Navbar({ onMenuClick }) {
         </div>
 
         {/* Menu Central - Desktop only */}
-        <div className={styles.navMenu}>
-          <a href="/" className={styles.navLink}>Home</a>
-          <a href="/upload" className={styles.navLink}>Upload</a>
-          <a href="/contratos" className={styles.navLink}>Contratos</a>
-          <a href="/sobre" className={styles.navLink}>Sobre</a>
-        </div>
+        {isAuthenticated && (
+          <div className={styles.navMenu}>
+            <a href="/" className={styles.navLink}>Home</a>
+            <a href="/upload" className={styles.navLink}>Upload</a>
+            <a href="/contratos" className={styles.navLink}>Contratos</a>
+            <a href="/sobre" className={styles.navLink}>Sobre</a>
+          </div>
+        )}
 
         {/* Icons */}
         <div className={styles.rightSection}>
-          {/* Notificações */}
-          <button className={styles.iconButton} aria-label="Notifications">
-            <Bell size={20} />
-            <span className={styles.notificationBadge}>3</span>
-          </button>
+          {isAuthenticated ? (
+            <>
+              {/* Notificações */}
+              <button className={styles.iconButton} aria-label="Notifications">
+                <Bell size={20} />
+                <span className={styles.notificationBadge}>3</span>
+              </button>
 
-          {/* User Menu */}
-          <div className={styles.userMenuContainer}>
-            <button 
-              className={styles.iconButton}
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              aria-label="User menu"
-            >
-              <User size={20} />
-            </button>
+              {/* User Menu */}
+              <div className={styles.userMenuContainer}>
+                <button 
+                  className={styles.iconButton}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  aria-label="User menu"
+                  title={user?.email}
+                >
+                  <User size={20} />
+                </button>
 
-            {showUserMenu && (
-              <div className={styles.userDropdown}>
-                <a href="/profile" className={styles.dropdownItem}>Perfil</a>
-                <a href="/settings" className={styles.dropdownItem}>Configurações</a>
-                <hr className={styles.divider} />
-                <a href="/logout" className={styles.dropdownItem + ' ' + styles.logout}>
-                  Sair
-                </a>
+                {showUserMenu && (
+                  <div className={styles.userDropdown}>
+                    <div className={styles.userInfo}>
+                      <div className={styles.userName}>{user?.name}</div>
+                      <div className={styles.userEmail}>{user?.email}</div>
+                    </div>
+                    <hr className={styles.divider} />
+                    <a href="/profile" className={styles.dropdownItem}>Perfil</a>
+                    <a href="/settings" className={styles.dropdownItem}>Configurações</a>
+                    <hr className={styles.divider} />
+                    <button 
+                      onClick={() => {
+                        setShowUserMenu(false)
+                        logout()
+                      }}
+                      className={styles.dropdownItem + ' ' + styles.logout}
+                    >
+                      <LogOut size={16} />
+                      Sair
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            /* Login Button */
+            <button 
+              onClick={login}
+              className={styles.loginBtn}
+            >
+              <LogIn size={20} />
+              Entrar
+            </button>
+          )}
         </div>
       </div>
     </nav>
